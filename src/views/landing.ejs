@@ -1,0 +1,182 @@
+<% include ./partials/header %>
+
+  <!-- Masthead -->
+  <header class="masthead text-white text-center">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <legend style="text-align: center; font-size: 2em;  line-height: 1;"><i class="fas fa-4x fa-hand-holding-usd"></i></legend>
+          <br><br>
+          <h1>Καλώς ήρθατε στο</h1>
+          <h1 style="font-size: 5rem; font-family: 'Kalam'" class="mb-3">MyFuel</h1>
+        </div>
+        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+          <h2 class="mb-5">Οικονομικά καύσιμα σε λίγα μόνο λεπτά</h2>
+          <% if(currentUser && !currentUser.isBlocked && currentUser.type=="user") { %> <!-- && short-circuits -->
+            <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+              <a class="btn btn-primary btn-block btn-lg" href="/posts/new"><i class="fas fa-plus"></i>&nbsp;&nbsp;Προσθήκη</a> <!-- BE CAREFUL - type="submit"  -->
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="features-icons bg-light">
+    <div class="container">
+      <form action="/posts" method="get" style="border-bottom: 1px solid #e9ecef;">
+        <div style="text-align: center;">
+          <legend style="padding-bottom: 20px; font-size: 2em; line-height: 1; text-align: left;">Αναζήτηση προσφοράς</legend>
+        </div>
+      <div class="form-row">
+        <div class="from-group col-lg-4 col-md-4 col-sm-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <label for="fuelType">Τύπος Καυσίμου</label>
+            <select class="form-control" name="fuelType">
+              <option style="display: none;" disabled selected>--select a fuel type--</option>
+              <option value="'UNLEADED 95'">UNLEADED 95</option>
+              <option value="'UNLEADED LRP'">UNLEADED LRP</option>
+              <option value="'UNLEADED 100'">UNLEADED 100</option>
+              <option value="'HEATING GASOIL'">HEATING GASOIL</option>
+              <option value="'DIESEL'">DIESEL</option>
+              <option value="'KEROSENE'">KEROSENE</option>
+              <option value="'LPG'">LPG</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <label for="location">Τοποθεσία</label>
+            <input class="form-control" name="location" id="pac-input" type="text" placeholder="--επιλογή τοποθεσίας--">
+          </div>
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+          <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+            <label style="color: #f8f9fa;">blah</label>
+            <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-search"></i>&nbsp;Αναζήτηση</button> <!-- BE CAREFUL - type="submit"  -->
+          </div>
+        </div>
+      </div>
+      </form>
+    </div>
+    <% if(currentUser && currentUser.type=="user") { %>
+    <div class="container mt-4">
+      <form action="/posts" method="get">
+        <div style="text-align: center">
+          <legend style="padding-bottom: 20px; font-size: 2em; line-height: 1; text-align: left;">Εναλλακτικά, επιλέξτε μία από τις Τοποθεσίες σας.</legend>
+        </div>
+        <div class="form-row">
+          <div class="from-group col-lg-6 col-md-6 col-sm-6">
+            <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+              <label for="location">Τοποθεσίες</label>
+              <select class="form-control" name="location">
+                <option style="display: none;" disabled selected>--επιλογή--</option>
+                <% currentUser.locations.forEach(function(location) { %>
+                  <option value="<%= location.location %>"><%= location.name %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+              <label style="color: #f8f9fa;">blah</label>
+              <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-search"></i>&nbsp;Αναζήτηση</button> <!-- BE CAREFUL - type="submit"  -->
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <% } %>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="call-to-action text-white text-center">
+    <div class="overlay"></div>
+  </section>
+
+  <!-- Icons Grid -->
+  <section id="priviledges" class="features-icons bg-light text-center">
+    <div class="container">
+      <legend style="text-align: center"><h1>Με τη δημιουργία λογαριασμού στο <span style="font-family: 'Kalam'">MyFuel</span>, απολαμβάνετε μοναδικά προνόμια.</h1></legend>
+      <div class="row justify-content-center mt-5">
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="fas fa-user  m-auto text-primary"></i>
+            </div>
+            <h3>Προσωπικό προφίλ</h3>
+            <h5 class="lead mb-0">Αποθηκεύστε τοποθεσίες και πρατήρια που επισκέπτεστε συχνά για εξατομίκευση των αναζητήσεων σας.</h5>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="fas fa-search-plus  m-auto text-primary"></i>
+            </div>
+            <h3>Προσθήκη/Αναζήτηση</h3>
+            <h5 class="lead mb-0">Προσφέρετε πίσω σε αυτούς που σας βοήθησαν με δικές σας προσθήκες.</h5>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="fas fa-dollar-sign m-auto text-primary"></i>
+            </div>
+            <h3>Εξαργύρωση Πόντων</h3>
+            <h5 class="lead mb-0">Εξαργυρώστε τους πόντους από κάθε προσθήκη που κάνετε σε πρατήριο της επιλογής σας.</h5>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="fas fa-star m-auto text-primary"></i>
+            </div>
+            <h3>Βαθμολογία</h3>
+            <h5 class="lead mb-0">Επιβραβεύστε τους αγαπημένους σας χρήστες ή αφήστε ένα σχόλιο.</h5>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="fas fa-chart-line m-auto text-primary"></i>
+            </div>
+            <h3>Εξέλιξη τιμής</h3>
+            <h5 class="lead mb-0">Παρακολουθήστε την εξέλιξη των τιμών και βελτιώστε τις αναζητήσεις σας.</h5>
+          </div>
+        </div>
+      </div>
+      <% if(!currentUser) { %>
+      <div class="mt-5">
+        <a href="/register" class="btn btn-primary btn-lg btn-block"><h4 class="mb-0">Ναι, θέλω να γίνω μέλος του <span style="font-family: 'Kalam'">MyFuel</span>!</h4></a>
+      </div>
+      <% } %>
+    </div>
+  </section>
+
+<div id="map"></div>
+
+<script>
+  function initMap() {
+    var lat = 37.983810;
+    var lng = 23.727539;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: center,
+        scrollwheel: true // false an DEN thelo na kanei zoom
+    });
+    var geocoder = new google.maps.Geocoder;
+
+    var input = document.getElementById('pac-input');
+    var autocomplete = new google.maps.places.Autocomplete(input, {fields: ['place_id', 'name', 'types']});
+    autocomplete.bindTo('bounds', map);
+    autocomplete.addListener('place_changed', function() {
+       var place = autocomplete.getPlace();
+       $("input[name='location']").val(place.name);
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GEOCODER_API_KEY %>&language=el&region=GR&libraries=places&callback=initMap&fbclid=IwAR2jO4fZa0RL2LeJN4J9QIBZBM3U5Ionjzah-r0WFG4qEndyw7GsFfJwJzE"></script>
+
+<% include ./partials/footer %>

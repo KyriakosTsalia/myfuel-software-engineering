@@ -1,0 +1,5 @@
+{
+    "jwtPrivateKey": "MyFuel_jwtPrivateKey"
+
+    //export MyFuel_jwtPrivateKey=Mojojojo
+}

@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: app
+    build: ./src/
+    ports:
+      - 3000:3000
+    depends_on: 
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - myfuel_db:/data/db
+    networks:
+      - app-network
+
+volumes:
+  myfuel_db:
+networks:
+  app-network:

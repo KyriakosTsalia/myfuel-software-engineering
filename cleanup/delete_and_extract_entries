@@ -1,0 +1,30 @@
+#!/bin/sh
+
+
+../mongo_start
+
+#Unleaded 95
+mongo myFuel_database delete_and_extract.js > o.csv
+
+
+cat o.csv | paste -d "," - - - | tail -n 1 > out.csv
+#awk -F "," '{print substr($1,5,11)","$2}' unleaded95.csv > out_unleaded95.csv
+
+
+
+DATE=$(date +%D)
+awk -v var="$DATE" '{print var","$0}' out.csv >> fuels1.csv
+
+#make it executable
+chmod u+x fuels1.csv
+
+#gnuplot gnuplot_script
+#mv fuels.png ../src/public/img/
+
+#remember to extract only info needed
+#For example average the prices for each fuelType
+rm o.csv
+rm out.csv
+
+#rm output1.csv
+#Got also to remove them after all

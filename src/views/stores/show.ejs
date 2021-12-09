@@ -1,0 +1,291 @@
+<% include ../partials/header %>
+
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-12 col-lg-12 mb-5">
+      <div id="map" style="height: 600px; width:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-4">
+  <div class="row mb-3">
+    <% if(currentUser && currentUser.type=="user") { %>
+    <div class="col-md-4 mb-2">
+      <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#newLocationModal"><i class="fas fa-plus"></i> Προσθήκη στις Τοποθεσίες μου</button>
+    </div>
+    <% } %>
+    <% if(currentUser && currentUser.isAdmin) { %>
+    <div class="col-md-4 mb-2">
+      <a class="btn btn-warning btn-block" href="/stores/<%= store._id %>/edit">
+        <i class="fas fa-edit"></i>
+          Επεξεργασία
+      </a>
+    </div>
+    <div class="col-md-4 mb-2">
+      <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#exampleModalLong">
+        <i class="far fa-trash-alt"></i>
+          Διαγραφή
+      </button>
+    </div>
+    <% } %>
+  </div>
+  <% if(posts.length === 0) { %>
+    <% if(currentUser && store._id.equals(currentUser._id)) { %>
+    <div class="row text-center">
+      <div class="col-md-12 col-lg-12 col-sm-12">
+        <h2 style="padding-bottom: 10rem; padding-top: 4rem;"><i class="fas fa-search"></i>&nbsp;Δεν υπάρχουν τρέχουσες προσφορές στο πρατήριο σας.</h2>
+      </div>
+    </div>
+    <% } else { %>
+      <div class="row text-center">
+        <div class="col-md-12 col-lg-12 col-sm-12">
+          <h2 style="padding-bottom: 10rem; padding-top: 4rem;"><i class="fas fa-search"></i>&nbsp;Δεν υπάρχουν τρέχουσες προσφορές στο συγκεκριμένο πρατήριο.</h2>
+        </div>
+      </div>
+    <% } %>
+  <% } else { %>
+  <div class="row text-center">
+      <% posts.forEach(function(post){ %>
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-5">
+        <div class="card">
+          <% if(post.location.brand==="AVIN") { %>
+            <img src="/img/avin.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="bp") { %>
+            <img src="/img/bp.png" class="card-img-top">
+          <% } else if(post.location.brand==="Coral") { %>
+            <img src="/img/coral.jpeg" class="card-img-top">
+          <% } else if(post.location.brand==="Coral Gas") { %>
+            <img src="/img/coralgas.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="EKO") { %>
+            <img src="/img/eko.png" class="card-img-top">
+          <% } else if(post.location.brand==="ELIN") { %>
+            <img src="/img/elin.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="ETEKA") { %>
+            <img src="/img/eteka.png" class="card-img-top">
+          <% } else if(post.location.brand==="CYCLON") { %>
+            <img src="/img/cyclon.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="melco oil") { %>
+            <img src="/img/melcooil.jpeg" class="card-img-top">
+          <% } else if(post.location.brand==="revoil") { %>
+            <img src="/img/revoil.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="Shell") { %>
+            <img src="/img/shell.png" class="card-img-top">
+          <% } %>
+
+          <div class="card-body pb-0">
+            <div class="card-title">
+              <h4><%= post.fuelType %></h4>
+              <h3>&euro;<%= post.price %>/Λίτρο</h3>
+              <% if (post.rating === 0) { %>
+                <em>No reviews yet.</em>
+              <% } else { %>
+                <span class="fas fa-star checked"></span>
+                <span class=" <% if (post.rating <= 1) { %> far fa-star <% } else if(post.rating > 1 && post.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 2) { %> far fa-star <% } else if(post.rating > 2 && post.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 3) { %> far fa-star <% } else if(post.rating > 3 && post.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 4) { %> far fa-star <% } else if(post.rating > 4 && post.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <% } %>
+              <p class="text-muted mt-0">
+              <i class="far fa-clock"></i><%= findTimestamp(post.createdAt) %></p>
+            </div>
+          </div>
+          <a id="info-button" href="/posts/<%= post._id %>" class="btn btn-primary btn-block">Περισσότερα</a>
+
+        </div>
+
+      </div>
+        <% }); %>
+  </div>
+
+
+  <% if(currentUser && currentUser.type=="user" && !currentUser.isBlocked) { %>
+  <p>
+    <a id="newButton" href="/posts/new" class="btn btn-success btn-lg"><i class="fas fa-2x fa-plus"></i></a>
+  </p>
+  <% } %>
+
+  <!-- pagination stuff -->
+  <div class="row justify-content-center">
+    <nav aria-label="..">
+      <% if (pages && pages > 0) { %>
+      <ul class="pagination justify-content-center">
+      <% if (current == 1) { %>
+        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">First</a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/stores/<%= store._id %>">First</a></li>
+      <% } %>
+
+      <% if (current == 1) { %>
+        <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&laquo;</span></a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/stores/<%= store._id %>?page=<%= Number(current) - 1 %>"><span aria-hidden="true">&laquo;</span></a></li>
+      <% } %>
+
+      <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+      <% if (i !== 1) { %>
+        <li class="page-item disabled"><a class="page-link">...</a></li>
+      <% } %>
+      <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+        <% if (i == current) { %>
+          <li class="page-item active"><a class="page-link"><%= i %></a></li>
+        <% } else { %>
+          <li class="page-item"><a class="page-link" href="/stores/<%= store._id %>?page=<%= i %>"><%= i %></a></li>
+        <% } %>
+        <% if (i == Number(current) + 4 && i < pages) { %>
+          <li class="page-item disabled"><a class="page-link">...</a></li>
+        <% } %>
+      <% } %>
+
+      <% if (current == pages) { %>
+        <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&raquo;</span></a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/stores/<%= store._id %>?page=<%= Number(current) + 1 %>"><span aria-hidden="true">&raquo;</span></a></li>
+      <% } %>
+
+      <% if (current == pages) { %>
+        <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Last</a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/stores/<%= store._id %>?page=<%= pages %>">Last</a></li>
+      <% } %>
+      </ul>
+    <% } %>
+    </nav>
+  </div>
+  <% } %>
+
+</div>
+
+  <!-- Modal -->
+  <% if(currentUser && currentUser.isAdmin) { %> <!-- && short-circuits -->
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Διαγραφή πρατηρίου</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                      <h5>Προσοχή!</h5><h6>Το πρατήριο και όλες οι προσφορές σε αυτό θα διαγραφούν οριστικά μετά από αυτό το βήμα.</h6>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button id="decline" type="button" class="btn btn-default" data-dismiss="modal">Άκυρο</button>
+            <form id="delete-form" action="/stores/<%= store._id %>?_method=DELETE" method="post">
+              <button class="btn btn-danger">
+                <i class="far fa-trash-alt"></i>
+                  Διαγραφή</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- New Location Modal -->
+  <% if(currentUser) { %>
+  <div class="modal fade" id="newLocationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 100%; margin: 1.75rem auto;" role="document">
+      <div class="modal-content" style="width: 80%; margin: 0 auto">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Νέα Τοποθεσία</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container text-left">
+            <form class="" action="/users/<%= currentUser._id %>/locations/new" method="post">
+              <div class="form-row">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                  <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                    <label for="newLocation">Τοποθεσία</label>
+                    <input type="text" class="form-control" name="newLocation" value="<%= store.location %>" readonly>
+                  </div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                  <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                    <label for="newLocationName">Όνομα</label>
+                    <input class="form-control" name="newLocationName" type="text" placeholder="--όνομα τοποθεσίας--" required>
+                  </div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                  <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+                    <label style="color: #f8f9fa;">blah</label>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Προσθήκη</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="decline" type="button" class="btn btn-light" data-dismiss="modal">Άκυρο</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+
+
+
+
+
+<script>
+  function initMap() {
+    var lat = <%= store.lat %>;
+    var lng = <%= store.lng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+    <strong><%= store.brand %><br />
+    <%= store.location %></strong><br>
+    <a href="https://www.google.com/maps/dir/?api=1&destination=<%= store.lat %>,<%= store.lng %>&query_place_id=<%= store.location %>&travelmode=driving" target="_blank">Λήψη Οδηγιών</a>
+    `
+    var infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
+    var marker = new google.maps.Marker({
+        position: center,
+        map: map,
+        animation: google.maps.Animation.DROP
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GEOCODER_API_KEY %>&language=el&region=GR&libraries=places&callback=initMap&fbclid=IwAR2jO4fZa0RL2LeJN4J9QIBZBM3U5Ionjzah-r0WFG4qEndyw7GsFfJwJzE"></script>
+
+
+<% include ../partials/footer %>
+
+
+<% function findTimestamp(date) { %>
+<% var seconds = Math.ceil((Date.now() - date) / 1000); %>
+<% if( seconds < 60) return "τώρα"; %>
+<% if( seconds < 120) return "πριν ένα λεπτό"; %>
+<% if( seconds < 3600) return "πριν "+Math.floor(seconds/60)+" λεπτά"; %>
+<% if( seconds < 7200) return "πριν μία ώρα"; %>
+<% if( seconds < 86400) return "πριν "+Math.floor(seconds/3600)+" ώρες"; %>
+<% if( seconds < 172800) return "πριν μία μέρα"; %>
+<% if( seconds < 604800) return "πριν "+Math.floor(seconds/86400)+" μέρες"; %>
+<% if( seconds < 1209600) return "πριν μία εβδομάδα"; %>
+<% if( seconds < 2629744) return "πριν "+Math.floor(seconds/604800)+" εβδομάδες"; %>
+<% if( seconds < 5259488) return "πριν ένα μήνα" %>
+<% if( seconds < 31556926) return "πριν "+Math.floor(seconds/2629744)+" μήνες"; %>
+<% if( seconds < 63113852) return "πριν ένα χρόνο" %>
+<% return "πάνω από πριν ένα χρόνο" %>
+<% } %>

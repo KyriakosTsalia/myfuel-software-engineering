@@ -1,0 +1,53 @@
+<% include ./partials/header %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col">
+      <h1><%= user.username %>, με το σύστημα εξαργύρωσης πόντων MyFuel, μπορείς να εξοικονομήσεις χρήματα τώρα!</h1>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-5 col-lg-4">
+      <div id="progressBar" class="<%= findColor(currentUser.points) %>" >
+        <span class="progress-left">
+          <span id="leftBar" class="progress-bar"></span>
+        </span>
+        <span class="progress-right">
+          <span id="rightBar" class="progress-bar"></span>
+        </span>
+        <div id="valueBar" class="progress-value"><%= currentUser.points %></div>
+      </div>
+    </div>
+    <div class="col-md-7 col-lg-8">
+      <h4>Η χρηματική αξία των <%= user.points %> πόντων σου είναι <%= user.points/40 %>&euro;</h4>
+      <br><br>
+      <form action="/users/<%= user._id %>/redeem" method="post">
+        <div class="form-group">
+          <label for="redeemPoints">Επίλεξε τους πόντους που θέλεις να εξαργυρώσεις</label>
+          <input class="form-control" type="number" name="redeemPoints" value="0" min="100" max="<%= user.points %>" step="100">
+        </div>
+        <button class="btn btn-success btn-lg">
+          <i class="fas fa-gift"></i>
+            Εξαργύρωση</button>
+            <br><br>
+            <a class="btn btn-default pl-0" href="/users/<%= user.id %>">Πίσω στο προφίλ μου</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% include ./partials/footer %>
+
+<% function findColor(points) { %>
+<% if( points < 200) return "progress zero"; %>
+<% if( points < 400) return "progress ten"; %>
+<% if( points < 600) return "progress twenty"; %>
+<% if( points < 800) return "progress thirty"; %>
+<% if( points < 1000) return "progress fourty"; %>
+<% if( points < 1200) return "progress fifty"; %>
+<% if( points < 1400) return "progress sixty"; %>
+<% if( points < 1600) return "progress seventy"; %>
+<% if( points < 1800) return "progress eighty"; %>
+<% if( points < 2000) return "progress ninety"; %>
+<% if( points >= 2000) return "progress hundred"; %>
+<% } %>

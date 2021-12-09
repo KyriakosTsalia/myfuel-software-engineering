@@ -1,0 +1,112 @@
+<% include ../partials/header %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-sm-8 col-lg-6 col-10" style="margin: 10px auto; box-shadow: 0px 0px 5px #cccccc; padding: 20px;">
+      <form action="/posts/<%= post._id %>?_method=PUT" method="post">
+        <legend style="text-align: center; padding: 10px 20px 0px 20px; font-size: 2em;  line-height: 1; color: gray"><i class="fas fa-2x fa-hand-holding-usd"></i></legend>
+        <legend style="text-align: center; padding: 10px 20px 20px 20px; font-size: 2em;  line-height: 1;">Επεξεργασία Προσφοράς</legend>
+        <div class="form-group">
+          <label for="fuelType">Τύπος Καυσίμου</label>
+          <select id="selectFuelType" class="form-control" name="post[fuelType]" autofocus>
+            <option style="display: none;" selected value="<%= post.fuelType %>"><%= post.fuelType %></option>
+            <option value="'UNLEADED 95'">UNLEADED 95</option>
+            <option value="'UNLEADED LRP'">UNLEADED LRP</option>
+            <option value="'UNLEADED 100'">UNLEADED 100</option>
+            <option value="'HEATING GASOIL'">HEATING GASOIL</option>
+            <option value="'DIESEL'">DIESEL</option>
+            <option value="'KEROSENE'">KEROSENE</option>
+            <option value="'LPG'">LPG</option>
+          </select>
+        </div>
+        <label for="location">Τοποθεσία</label>
+        <div class="input-group" style="margin-bottom: 16px;">
+          <input class="form-control" type="text" name="location" value="<%= post.locationName %>" placeholder="Αναζήτηση πρατηρίου" readonly required>
+          <div class="input-group-btn"><button type="button" class="btn btn-primary" data-toggle="modal" data-target=".modal"><i class="fas fa-search-location"></i></button></div>
+        </div>
+        <div class="form-group">
+          <label for="price">Τιμή</label>
+          <input class="form-control" type="number" name="post[price]" value="<%= post.price %>"placeholder="price" min="0.001" step="0.001">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-large btn-primary btn-block" type="submit" name="button">Ενημέρωση</button> <!-- BE CAREFUL - type="submit" -->
+        </div>
+      </form>
+      <a class="btn btn-default pl-0" href="javascript:history.go(-1)">Πίσω</a>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade myModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="myModal" role="document">
+      <div class="modal-content" style="height: 85vh; width: 85vw; margin: 0 auto">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Κάνετε click στο πρατήριο που σας ενδιαφέρει</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="map" style="width: 100%; height: 100%;">
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<script>
+  function initMap() {
+    var lat = <%= currentUser.addressLat %>;
+    var lng = <%= currentUser.addressLng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 9.5,
+        center: center,
+        scrollwheel: true // false an DEN thelo na kanei zoom
+    });
+    var contentString = `
+      <strong>Hi</strong>
+    `
+    var infowindow = new google.maps.InfoWindow();
+
+    var marker,i;
+    var markers=[];
+
+    <% for (i = 0; i < stores.length; i++) { %>
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(<%= stores[i].lat %>, <%= stores[i].lng %>),
+          map: map,
+          animation: google.maps.Animation.DROP
+        });
+
+        markers.push(marker);
+
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infowindow.setContent(`
+            <%= stores[i].location %></strong><br>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=<%= stores[i].lat %>,<%= stores[i].lng %>&query_place_id=<%= stores[i].location %>&travelmode=driving" target="_blank">Λήψη Οδηγιών</a>
+            <br><button class="btn btn-primary" onclick="myFunction($(this))" type="button" name="button" data-dismiss="modal" value="<%= stores[i].location %>">Επιλογή</button>
+            `);
+            infowindow.open(map, marker);
+          }
+        })(marker, i));
+    <% } %>
+    var markerCluster = new MarkerClusterer(map, markers,
+    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+}
+
+</script>
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GEOCODER_API_KEY %>&language=el&region=GR&libraries=places&callback=initMap&fbclid=IwAR2jO4fZa0RL2LeJN4J9QIBZBM3U5Ionjzah-r0WFG4qEndyw7GsFfJwJzE"></script>
+
+<script type="text/javascript">
+  function myFunction(button) {
+    console.log(button[0].value);
+    $("form input[name=location]").val(button[0].value);
+}
+</script>
+
+<% include ../partials/footer %>

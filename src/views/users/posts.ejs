@@ -1,0 +1,254 @@
+<% include ../partials/header %>
+
+<div class="container mt-5">
+  <div class="row text-center">
+    <div class="col-sm-12 col-md-5 col-lg-4">
+  		<div class="card mb-3">
+          <% if(!user.avatar) { %>
+            <img class="card-img-top" src="/img/defaultAvatar.png" alt="user profile image">
+          <% } else { %>
+            <img class="card-img-top" src="<%= user.avatar  %>" alt="user profile image">
+          <% } %>
+
+
+        <div class="card-body">
+          <div class="card-title">
+            <% if (user.rating === 0) { %>
+              <em class="text-muted">(Δεν έχει βαθμολογηθεί)</em>
+            <% } else { %>
+              <span class="fas fa-2x fa-star checked"></span>
+              <span class="fa-2x <% if (user.rating <= 1) { %> far fa-star <% } else if(user.rating > 1 && user.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (user.rating <= 2) { %> far fa-star <% } else if(user.rating > 2 && user.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (user.rating <= 3) { %> far fa-star <% } else if(user.rating > 3 && user.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (user.rating <= 4) { %> far fa-star <% } else if(user.rating > 4 && user.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+            <% } %>
+            <h1><%= user.firstName + " " + user.lastName %><i class="far fa-check-circle" style="top: 5px; color: #1da1f2"></i></h1>
+            <em class="text-muted">@<%= user.username %></em><br>
+          </div>
+          <i class="far fa-envelope"></i><a href="mailto:<%= user.email %>">&nbsp;<%= user.email %></a><br>
+            <i class="far fa-calendar-alt"></i>&nbsp;Μέλος από <%= user.createdAt.toDateString() %>
+        </div>
+        <% if(currentUser && user._id.equals(currentUser._id) || currentUser && currentUser.isAdmin) { %> <!-- && short-circuits -->
+            <div id="profile-buttons" class="float-left pb-1">
+              <% if(currentUser && user._id.equals(currentUser._id) && !currentUser.isBlocked) { %> <!-- && short-circuits -->
+              <button  class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModalLong">
+                <i class="fas fa-gift"></i></button>
+              <% } %>
+              <a class="btn btn-warning btn-lg" href="/users/<%= user._id %>/edit">
+                <i class="fas fa-user-edit"></i></a>
+              <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#exampleModal">
+                <i class="far fa-trash-alt"></i></button>
+              <% if(currentUser && currentUser.isAdmin && !user.isAdmin && !user.isBlocked) { %>
+              <form id="block-form" action="/users/<%= user._id %>/block/?_method=PUT" method="post">
+                <button class="btn btn-danger btn-lg">
+                  <i class="fas fa-lock"></i></button>
+              </form>
+              <% } else if(currentUser && currentUser.isAdmin && !user.isAdmin && user.isBlocked){ %>
+                <form  id="block-form" action="/users/<%= user._id %>/unblock/?_method=PUT" method="post">
+                  <button class="btn btn-success btn-lg">
+                    <i class="fas fa-unlock"></i></button>
+                </form>
+              <% } %>
+            </div>
+        <% } %>
+  		</div>
+    </div>
+
+    <div id="profileNav" class="col-sm-12 col-md-7 col-lg-8">
+      <ul class="nav flex-column flex-md-row nav-tabs">
+        <% if(currentUser && user._id.equals(currentUser._id)) { %>
+        <li class="flex-md-fill text-md-center nav-item">
+          <a href="#posts" class="nav-link active" role="tab">Οι προσθήκες μου</a>
+        </li>
+        <% } else { %>
+          <li class="flex-md-fill text-md-center nav-item">
+            <a href="#posts" class="nav-link active" role="tab">Προσθήκες</a>
+          </li>
+        <% } %>
+
+        <% if(currentUser && user._id.equals(currentUser._id)) { %>
+        <li class="flex-md-fill text-md-center nav-item">
+          <a href="/users/<%= user._id %>/locations" class="nav-link" role="tab">Οι Τοποθεσίες μου</a>
+        </li>
+        <% } else if(currentUser && currentUser.isAdmin) { %>
+        <li class="flex-md-fill text-md-center nav-item">
+          <a href="/users/<%= user._id %>/locations" class="nav-link" role="tab">Τοποθεσίες</a>
+        </li>
+        <% } %>
+      </ul>
+    <div class="tab-content">
+      <div class="tab-pane active mt-3" id="posts" role="tabpanel">
+
+        <div class="row text-center">
+          <% posts.forEach(function(post) { %>
+            <div class="col-xl-4 col-lg-6 col-md-12 col-sm-6 mb-4">
+              <div class="card">
+                <% if(post.location.brand==="AVIN") { %>
+                  <img src="/img/avin.jpg" class="card-img-top">
+                <% } else if(post.location.brand==="bp") { %>
+                  <img src="/img/bp.png" class="card-img-top">
+                <% } else if(post.location.brand==="Coral") { %>
+                  <img src="/img/coral.jpeg" class="card-img-top">
+                <% } else if(post.location.brand==="Coral Gas") { %>
+                  <img src="/img/coralgas.jpg" class="card-img-top">
+                <% } else if(post.location.brand==="EKO") { %>
+                  <img src="/img/eko.png" class="card-img-top">
+                <% } else if(post.location.brand==="ELIN") { %>
+                  <img src="/img/elin.jpg" class="card-img-top">
+                <% } else if(post.location.brand==="ETEKA") { %>
+                  <img src="/img/eteka.png" class="card-img-top">
+                <% } else if(post.location.brand==="CYCLON") { %>
+                  <img src="/img/cyclon.jpg" class="card-img-top">
+                <% } else if(post.location.brand==="melco oil") { %>
+                  <img src="/img/melcooil.jpeg" class="card-img-top">
+                <% } else if(post.location.brand==="revoil") { %>
+                  <img src="/img/revoil.jpg" class="card-img-top">
+                <% } else if(post.location.brand==="Shell") { %>
+                  <img src="/img/shell.png" class="card-img-top">
+                <% } %>
+                <div class="card-body pb-0">
+                  <div class="card-title">
+                    <h4><%= post.fuelType %></h4>
+                    <h3>&euro;<%= post.price %>/Λίτρο</h3>
+                    <% if (post.rating === 0) { %>
+                      <em>No reviews yet.</em>
+                    <% } else { %>
+                      <span class="fas fa-star checked"></span>
+                      <span class=" <% if (post.rating <= 1) { %> far fa-star <% } else if(post.rating > 1 && post.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                      <span class=" <% if (post.rating <= 2) { %> far fa-star <% } else if(post.rating > 2 && post.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                      <span class=" <% if (post.rating <= 3) { %> far fa-star <% } else if(post.rating > 3 && post.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                      <span class=" <% if (post.rating <= 4) { %> far fa-star <% } else if(post.rating > 4 && post.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                    <% } %>
+                    <p class="text-muted mt-0"><i class="far fa-clock"></i><%= findTimestamp(post.createdAt) %></p>
+                  </div>
+                </div>
+                <a id="info-button" href="/posts/<%= post._id %>" class="btn btn-primary btn-block">Περισσότερα</a>
+              </div>
+            </div>
+          <% }); %>
+          </div>
+      </div>
+
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<% if(currentUser && user._id.equals(currentUser._id) && !currentUser.isBlocked) { %> <!-- && short-circuits -->
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Οι πόντοι μου</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+              <div class="row">
+                  <div class="col">
+                      <div class="<%= findColor(currentUser.points) %>" >
+                          <span class="progress-left">
+                              <span class="progress-bar"></span>
+                          </span>
+                          <span class="progress-right">
+                              <span class="progress-bar"></span>
+                          </span>
+                          <div class="progress-value"><%= currentUser.points %></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="decline" type="button" class="btn btn-light" data-dismiss="modal">Κλείσιμο</button>
+          <% if(currentUser.points >= 2000) { %>
+          <a class="btn btn-success" href="/users/<%= user._id %>/redeem">
+            <i class="fas fa-gift"></i>
+              Εξαργύρωση
+          </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<!-- Modal -->
+<% if(currentUser && user._id.equals(currentUser._id) || currentUser && currentUser.isAdmin) { %>
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Διαγραφή Λογαριασμού</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+              <div class="row">
+                  <div class="col">
+                    <% if(currentUser && user._id.equals(currentUser._id)) { %>
+                      <h5>Προσοχή!</h5><h6>Με τη διαγραφή του MyFuel λογαριασμού σου, θα χάσεις τα αποκλειστικά για εγγεγραμένους χρήστες προνόμια.</h6>
+                    <% } else if(currentUser && currentUser.isAdmin) { %>
+                      <h5>Προσοχή!</h5><h6>Η διαγραφή του χρήστη είναι οριστική.</h6>
+                    <% } %>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="decline" type="button" class="btn btn-light" data-dismiss="modal">Άκυρο</button>
+          <form id="delete-form" action="/users/<%= user._id %>?_method=DELETE" method="post">
+            <button class="btn btn-danger">
+              <i class="far fa-trash-alt"></i>
+                Διαγραφή</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if(currentUser && currentUser.type=="user" && !currentUser.isBlocked) { %>
+<p>
+  <a id="newButton" href="/posts/new" class="btn btn-success btn-lg"><i class="fas fa-2x fa-plus"></i></a>
+</p>
+<% } %>
+
+<% include ../partials/footer %>
+
+<% function findTimestamp(date) { %>
+<% var seconds = Math.ceil((Date.now() - date) / 1000); %>
+<% if( seconds < 60) return "τώρα"; %>
+<% if( seconds < 120) return "πριν ένα λεπτό"; %>
+<% if( seconds < 3600) return "πριν "+Math.floor(seconds/60)+" λεπτά"; %>
+<% if( seconds < 7200) return "πριν μία ώρα"; %>
+<% if( seconds < 86400) return "πριν "+Math.floor(seconds/3600)+" ώρες"; %>
+<% if( seconds < 172800) return "πριν μία μέρα"; %>
+<% if( seconds < 604800) return "πριν "+Math.floor(seconds/86400)+" μέρες"; %>
+<% if( seconds < 1209600) return "πριν μία εβδομάδα"; %>
+<% if( seconds < 2629744) return "πριν "+Math.floor(seconds/604800)+" εβδομάδες"; %>
+<% if( seconds < 5259488) return "πριν ένα μήνα" %>
+<% if( seconds < 31556926) return "πριν "+Math.floor(seconds/2629744)+" μήνες"; %>
+<% if( seconds < 63113852) return "πριν ένα χρόνο" %>
+<% return "πάνω από πριν ένα χρόνο" %>
+<% } %>
+
+<% function findColor(points) { %>
+<% if( points < 200) return "progress zero"; %>
+<% if( points < 400) return "progress ten"; %>
+<% if( points < 600) return "progress twenty"; %>
+<% if( points < 800) return "progress thirty"; %>
+<% if( points < 1000) return "progress fourty"; %>
+<% if( points < 1200) return "progress fifty"; %>
+<% if( points < 1400) return "progress sixty"; %>
+<% if( points < 1600) return "progress seventy"; %>
+<% if( points < 1800) return "progress eighty"; %>
+<% if( points < 2000) return "progress ninety"; %>
+<% if( points >= 2000) return "progress hundred"; %>
+<% } %>

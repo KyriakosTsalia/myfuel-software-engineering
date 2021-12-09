@@ -1,0 +1,42 @@
+<% include ../partials/header %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-sm-8 col-lg-6 col-10" style="margin: 10px auto; box-shadow: 0px 0px 5px #cccccc; padding: 20px;">
+      <form action="/users/<%= user._id %>/?_method=PUT" method="POST" enctype="multipart/form-data">
+        <legend style="text-align: center; padding: 10px 20px 0px 20px; font-size: 2em;  line-height: 1; color: gray"><i class="fas fa-2x fa-hand-holding-usd"></i></legend>
+        <legend style="text-align: center; padding: 10px 20px 20px 20px; font-size: 2em; line-height: 1;">Επεξεργασία του λογαριασμού σας </legend>
+        <div class="form-group">
+          <label for="username">Όνομα Χρήστη</label>
+          <input class="form-control" type="text" name="username" value="<%= user.username %>" placeholder="username">
+        </div>
+        <div class="form-group">
+          <label for="firstName">Όνομα</label>
+          <input class="form-control" type="text" name="firstName" value="<%= user.firstName %>" placeholder="first name">
+        </div>
+        <div class="form-group">
+          <label for="lastName">Επίθετο</label>
+          <input class="form-control" type="text" name="lastName" value="<%= user.lastName %>" placeholder="last name">
+        </div>
+        <div class="form-group">
+          <label for="lastName">Διεύθυνση</label>
+          <input class="form-control" type="text" name="address" value="<%= user.address %>" placeholder="Ηρώων Πολυτεχνείου 9, Αθήνα, 15780" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input class="form-control" type="email" name="email" value="<%= user.email %>" placeholder="example@example.com">
+        </div>
+        <div class="form-group">
+          <label for="avatar">Εικόνα Προφίλ</label>
+          <input class="form-control-file" type="file" id="avatar" name="avatar" accept="image/*">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-large btn-primary btn-block" type="submit" name="button">Ενημέρωση</button> <!-- BE CAREFUL - type="submit" -->
+        </div>
+      </form>
+      <a class="btn btn-default pl-0" href="/users/<%= user.id %>">Πίσω</a>
+    </div>
+  </div>
+</div>
+
+<% include ../partials/footer %>

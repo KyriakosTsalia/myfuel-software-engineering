@@ -1,0 +1,26 @@
+<% include ./partials/header %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-sm-8 col-lg-6 col-10" style="margin: 10px auto; box-shadow: 0px 0px 5px #cccccc; padding: 20px;">
+      <form action="/login" method="POST" >
+        <legend style="text-align: center; padding: 10px 20px 0px 20px; font-size: 2em;  line-height: 1; color: gray"><i class="fas fa-2x fa-hand-holding-usd"></i></legend>
+        <legend style="text-align: center; padding: 10px 20px 20px 20px; font-size: 2em;  line-height: 1;">Είσοδος</legend>
+        <div class="form-group">
+          <label for="username">Όνομα Χρήστη</label>
+          <input class="form-control" type="text" name="username" value="" placeholder="username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Κωδικός Πρόσβασης</label>
+          <input class="form-control" type="password" name="password" value="" placeholder="password" required>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-large btn-primary btn-block" type="submit" name="button">Είσοδος</button> <!-- BE CAREFUL - type="submit" -->
+        </div>
+          <a href="/forgot">Ξεχάσατε τον κωδικό πρόσβασης;</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% include ./partials/footer %>

@@ -1,0 +1,85 @@
+<% include ../partials/header %>
+
+<% if (post.rating == 0) { %>
+<div class="container mt-5" style="margin-bottom: 25rem;">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5>
+            <em>Δεν υπάρχουν ακόμα κριτικές.</em>
+          </h5>
+          <% if(currentUser && !currentUser.isBlocked  &&currentUser.type=="user") { %>
+            <div>
+              <a class="btn btn-primary btn-lg <% if (currentUser && post.reviews.some(function (review) {return review.author.equals(currentUser._id)})) { %> disabled <% } %>" href="/posts/<%= post._id %>/reviews/new">
+                Νέα κριτική</a>
+              </div>
+          <% } %>
+          <div style="margin-top: 10px;">
+            <a class="btn btn-default pl-0" href="/posts/<%= post._id %>">Πίσω</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% } else { %>
+  <div class="container mt-5" style="margin-bottom: 15rem;">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <p>
+              <span class="fas fa-2x fa-star checked"></span>
+              <span class="fa-2x <% if (post.rating <= 1) { %> far fa-star <% } else if(post.rating > 1 && post.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (post.rating <= 2) { %> far fa-star <% } else if(post.rating > 2 && post.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (post.rating <= 3) { %> far fa-star <% } else if(post.rating > 3 && post.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <span class="fa-2x <% if (post.rating <= 4) { %> far fa-star <% } else if(post.rating > 4 && post.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <em>(Σύνολο κριτικών: <%= post.reviews.length %>)</em>
+            </p>
+            <p>
+              Βαθμολογία: <strong><%= post.rating.toFixed(1) %></strong>
+            </p>
+            <p><h4>Όλες οι κριτικές:</h4></p>
+            <hr style="margin-top: 0;">
+            <% post.reviews.forEach(function(review){ %>
+              <div class="row">
+                <div class="col-md-3">
+                  <%- '<span class="fas fa-star checked"></span>'.repeat(review.rating) %><%- '<span class="far fa-star"></span>'.repeat(5 - review.rating) %>
+                  <div>Από: <a href="/users/<%= review.author._id %>"><strong><%= review.author.username %></strong></a></div>
+                  <span><em><%= review.updatedAt.toDateString() %></em></span>
+                </div>
+                <div class="col-md-9">
+                  <p style="text-align: justify; word-wrap: break-word;">
+                    <%= review.text %>
+                  </p>
+                  <% if(currentUser && review.author.equals(currentUser._id) && !currentUser.isBlocked || currentUser && currentUser.isAdmin){ %>
+                    <a class="btn btn-xs btn-warning" href="/posts/<%=post._id %>/reviews/<%=review._id %>/edit"><i class="fas fa-edit"></i> Επεξεργασία</a>
+                      <form id="delete-form" action="/posts/<%=post._id %>/reviews/<%=review._id %>?_method=DELETE" method="POST">
+                        <button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i>
+                          Διαγραφή</button>
+                          </form>
+                  <% } %>
+                  </div>
+                </div>
+                <hr>
+            <% }); %>
+          <% if(currentUser && !currentUser.isBlocked  &&currentUser.type=="user") { %>
+            <div>
+              <a class="btn btn-primary btn-lg <% if (currentUser && post.reviews.some(function (review) {return review.author.equals(currentUser._id)})) { %> disabled <% } %>" href="/posts/<%= post._id %>/reviews/new">
+                Νέα κριτική</a>
+            </div>
+          <% } %>
+          <div style="margin-top: 10px;">
+            <a class="btn btn-default pl-0" href="/posts/<%= post._id %>">Πίσω</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<% } %>
+
+
+<% include ../partials/footer %>

@@ -1,0 +1,329 @@
+<% include ../partials/header %>
+
+<script type="text/javascript">
+  $("marker")
+</script>
+
+<div class="container mt-3">
+  <div class="row">
+    <div class="col">
+      <div id="map" style="height: 600px; width:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-4">
+  <header class="jumbotron">
+    <!-- add class text-center below if you want -->
+      <div class="container">
+        <div class="row">
+          <button id="filterButton" type="button" name="button" class="btn" data-toggle="collapse" data-target="#myForm" aria-expanded="false" aria-controls="collapseOne">Φιλτράρισμα &nbsp;<i class="fas fa-chevron-down"></i><i class="fas fa-chevron-up"></i></button>
+        </div>
+        <div class="collapse" id="myForm" data-parent=".jumbotron">
+          <form class=" mt-4" action="/posts" method="get" >
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="fuelType">Τύπος Καυσίμου</label>
+                <select class="form-control" name="fuelType">
+                  <% if(!fuelType) { %>
+                    <option style="display: none;" disabled selected>Όλα τα καύσιμα</option>
+                  <% } else {%>
+                    <option style="display: none;" selected><%= fuelType %></option>
+                  <% } %>
+                  <option value="'ALL'">Όλα τα καύσιμα</option>
+                  <option value="'UNLEADED 95'">UNLEADED 95</option>
+                  <option value="'UNLEADED LRP'">UNLEADED LRP</option>
+                  <option value="'UNLEADED 100'">UNLEADED 100</option>
+                  <option value="'HEATING GASOIL'">HEATING GASOIL</option>
+                  <option value="'DIESEL'">DIESEL</option>
+                  <option value="'KEROSENE'">KEROSENE</option>
+                  <option value="'LPG'">LPG</option>
+                </select>
+              </div>
+                <div class="form-group col-md-4">
+                  <label for="location">Τοποθεσία</label>
+                    <input class="form-control" name="location" id="pac-input" type="text" placeholder="--επιλογή τοποθεσίας--" value="<%= location %>">
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="distance">Απόσταση σε χλμ.</label>
+                  <% if(distance) { %>
+                    <input type="range" name="distance" class="form-control-range" id="formControlRange" min="1" max="5" step="1" value="<%= distance %>">
+                  <% } else { %>
+                    <input type="range" name="distance" class="form-control-range" id="formControlRange" min="1" max="5" step="1" value="5">
+                  <% } %>
+                  <ul style="padding: 0">
+                    <li style="display: inline-block">1</li>
+                    <li style="display: inline; position: absolute; left: 25%">2</li>
+                    <li style="display: inline; position: absolute; left: 50%">3</li>
+                    <li style="display: inline; position: absolute; right: 25%">4</li>
+                    <li style="display: inline; float: right">5</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-8">
+                  <label>Ταξινόμηση κατά</label><br>
+                  <% if(sort && sort=="byDate" || !sort) { %>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio1" value="byDate" checked>
+                    <label class="form-check-label" for="inlineRadio1">Ημερομηνία προσθήκης</label>
+                  </div>
+                  <% } else { %>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio1" value="byDate">
+                      <label class="form-check-label" for="inlineRadio1">Ημερομηνία προσθήκης</label>
+                    </div>
+                  <% } %>
+                  <% if(sort && sort=="byRating") { %>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio2" value="byRating" checked>
+                      <label class="form-check-label" for="inlineRadio2">Βαθμολογία</label>
+                    </div>
+                  <% } else { %>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio2" value="byRating">
+                      <label class="form-check-label" for="inlineRadio2">Βαθμολογία</label>
+                    </div>
+                  <% } %>
+                  <% if(sort && sort=="byPrice") { %>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio3" value="byPrice" checked>
+                      <label class="form-check-label" for="inlineRadio3">Τιμή</label>
+                    </div>
+                  <% } else { %>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="sortOptions" id="inlineRadio3" value="byPrice">
+                      <label class="form-check-label" for="inlineRadio3">Τιμή</label>
+                    </div>
+                  <% } %>
+                </div>
+                <div class="col-md-4">
+                  <label style="color: #e9ecef;">blah</label>
+                  <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-search"></i>&nbsp;Αναζήτηση</button> <!-- BE CAREFUL - type="submit"  -->
+                </div>
+              </div>
+          </form>
+        </div>
+    </div>
+  </header>
+
+
+  <% if(posts.length === 0) { %>
+    <div class="row text-center">
+      <div class="col-md-12 col-lg-12 col-sm-12">
+        <h2 style="padding-bottom: 10rem; padding-top: 4rem;"><i class="fas fa-search"></i>&nbsp;Δεν βρέθηκαν αποτελέσματα. Προσπαθήστε ξανά!</h2>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="row text-center">
+      <% posts.forEach(function(post){ %>
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-5">
+        <div class="card">
+          <% if(post.location.brand==="AVIN") { %>
+            <img src="/img/avin.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="bp") { %>
+            <img src="/img/bp.png" class="card-img-top">
+          <% } else if(post.location.brand==="Coral") { %>
+            <img src="/img/coral.jpeg" class="card-img-top">
+          <% } else if(post.location.brand==="Coral Gas") { %>
+            <img src="/img/coralgas.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="EKO") { %>
+            <img src="/img/eko.png" class="card-img-top">
+          <% } else if(post.location.brand==="ELIN") { %>
+            <img src="/img/elin.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="ETEKA") { %>
+            <img src="/img/eteka.png" class="card-img-top">
+          <% } else if(post.location.brand==="CYCLON") { %>
+            <img src="/img/cyclon.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="melco oil") { %>
+            <img src="/img/melcooil.jpeg" class="card-img-top">
+          <% } else if(post.location.brand==="revoil") { %>
+            <img src="/img/revoil.jpg" class="card-img-top">
+          <% } else if(post.location.brand==="Shell") { %>
+            <img src="/img/shell.png" class="card-img-top">
+          <% } %>
+
+          <div class="card-body pb-0">
+            <div class="card-title">
+              <h4><%= post.fuelType %></h4>
+              <h3>&euro;<%= post.price %>/Λίτρο</h3>
+              <% if (post.rating === 0) { %>
+                <em>No reviews yet.</em>
+              <% } else { %>
+                <span class="fas fa-star checked"></span>
+                <span class=" <% if (post.rating <= 1) { %> far fa-star <% } else if(post.rating > 1 && post.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 2) { %> far fa-star <% } else if(post.rating > 2 && post.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 3) { %> far fa-star <% } else if(post.rating > 3 && post.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class=" <% if (post.rating <= 4) { %> far fa-star <% } else if(post.rating > 4 && post.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+              <% } %>
+              <p class="text-muted mt-0"><i class="fas fa-map-marker-alt"></i> <%= findDistance(locationLat,locationLng,post.location.lat,post.location.lng) %> χλμ.<br>
+              <i class="far fa-clock"></i><%= findTimestamp(post.createdAt) %></p>
+            </div>
+          </div>
+          <a id="info-button" href="/posts/<%= post._id %>" class="btn btn-primary btn-block">Περισσότερα</a>
+
+        </div>
+
+      </div>
+        <% }); %>
+  </div>
+
+  <% if(currentUser && currentUser.type=="user" && !currentUser.isBlocked) { %>
+  <p>
+    <a id="newButton" href="/posts/new" class="btn btn-success btn-lg"><i class="fas fa-2x fa-plus"></i></a>
+  </p>
+  <% } %>
+
+  <!-- pagination stuff -->
+  <div class="row justify-content-center">
+    <nav aria-label="..">
+      <% if (pages && pages > 0) { %>
+      <ul class="pagination justify-content-center">
+      <% if (current == 1) { %>
+        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">First</a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/posts?fuelType=<%= fuelType %>&location=<%= location %>&distance=<%= distance %>&sortOptions=<%= sort %>">First</a></li>
+      <% } %>
+
+      <% if (current == 1) { %>
+        <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&laquo;</span></a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/posts?fuelType=<%= fuelType %>&location=<%= location %>&distance=<%= distance %>&sortOptions=<%= sort %>&page=<%= Number(current) - 1 %>"><span aria-hidden="true">&laquo;</span></a></li>
+      <% } %>
+
+      <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+      <% if (i !== 1) { %>
+        <li class="page-item disabled"><a class="page-link">...</a></li>
+      <% } %>
+      <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+        <% if (i == current) { %>
+          <li class="page-item active"><a class="page-link"><%= i %></a></li>
+        <% } else { %>
+          <li class="page-item"><a class="page-link" href="/posts?fuelType=<%= fuelType %>&location=<%= location %>&distance=<%= distance %>&sortOptions=<%= sort %>&page=<%= i %>"><%= i %></a></li>
+        <% } %>
+        <% if (i == Number(current) + 4 && i < pages) { %>
+          <li class="page-item disabled"><a class="page-link">...</a></li>
+        <% } %>
+      <% } %>
+
+      <% if (current == pages) { %>
+        <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&raquo;</span></a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/posts?fuelType=<%= fuelType %>&location=<%= location %>&distance=<%= distance %>&sortOptions=<%= sort %>&page=<%= Number(current) + 1 %>"><span aria-hidden="true">&raquo;</span></a></li>
+      <% } %>
+
+      <% if (current == pages) { %>
+        <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Last</a></li>
+      <% } else { %>
+        <li class="page-item"><a class="page-link" href="/posts?fuelType=<%= fuelType %>&location=<%= location %>&distance=<%= distance %>&sortOptions=<%= sort %>&page=<%= pages %>">Last</a></li>
+      <% } %>
+      </ul>
+    <% } %>
+    </nav>
+  </div>
+</div>
+
+<script>
+  function initMap() {
+  var lat = <%= locationLat %>;
+  var lng = <%= locationLng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+      <strong>Hi</strong>
+    `
+    var geocoder = new google.maps.Geocoder;
+
+    var marker1 = new google.maps.Marker({
+      map: map,
+      position: new google.maps.LatLng(lat, lng),
+      visible: false
+    });
+
+
+    <% if(!distance) { %>
+      var dist = 5;
+    <% } else { %>
+      var dist = <%= distance %>;
+    <% } %>
+
+    // Add circle overlay and bind to marker
+    var circle = new google.maps.Circle({
+      map: map,
+      radius: dist*1100,
+      // fillColor: '#dd9999',
+      fillColor: "rgb(0,98,255)",
+      fillOpacity: 0.15,
+      // strokeColor: '#dd9999',
+      strokeColor: "rgb(0,98,255)",
+      strokeOpacity: 0.4
+    });
+    circle.bindTo('center', marker1, 'position');
+
+    var marker,i;
+    marker = new google.maps.Marker({
+              map: map
+            });
+
+    var input = document.getElementById('pac-input');
+    var autocomplete = new google.maps.places.Autocomplete(input, {fields: ['place_id','name','types']});
+    autocomplete.bindTo('bounds', map);
+
+           autocomplete.addListener('place_changed', function() {
+             var place = autocomplete.getPlace();
+             $("input[name='location']").val(place.name);
+           });
+
+
+    var infowindow = new google.maps.InfoWindow({});
+    <% for (i = 0; i < posts.length; i++) { %>
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(<%= posts[i].lat %>, <%= posts[i].lng %>),
+          map: map,
+          animation: google.maps.Animation.DROP
+        });
+
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infowindow.setContent(`
+            <%= posts[i].locationName %></strong><br>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=<%= posts[i].lat %>,<%= posts[i].lng %>&query_place_id=<%= posts[i].locationName %>&travelmode=driving" target="_blank">Λήψη Οδηγιών</a>
+            `);
+            infowindow.open(map, marker);
+          }
+        })(marker, i));
+    <% } %>
+
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GEOCODER_API_KEY %>&language=el&region=GR&libraries=places&callback=initMap&fbclid=IwAR2jO4fZa0RL2LeJN4J9QIBZBM3U5Ionjzah-r0WFG4qEndyw7GsFfJwJzE"></script>
+
+
+<% include ../partials/footer %>
+
+<% function findTimestamp(date) { %>
+<% var seconds = Math.ceil((Date.now() - date) / 1000); %>
+<% if( seconds < 60) return "τώρα"; %>
+<% if( seconds < 120) return "πριν ένα λεπτό"; %>
+<% if( seconds < 3600) return "πριν "+Math.floor(seconds/60)+" λεπτά"; %>
+<% if( seconds < 7200) return "πριν μία ώρα"; %>
+<% if( seconds < 86400) return "πριν "+Math.floor(seconds/3600)+" ώρες"; %>
+<% if( seconds < 172800) return "πριν μία μέρα"; %>
+<% if( seconds < 604800) return "πριν "+Math.floor(seconds/86400)+" μέρες"; %>
+<% if( seconds < 1209600) return "πριν μία εβδομάδα"; %>
+<% if( seconds < 2629744) return "πριν "+Math.floor(seconds/604800)+" εβδομάδες"; %>
+<% if( seconds < 5259488) return "πριν ένα μήνα" %>
+<% if( seconds < 31556926) return "πριν "+Math.floor(seconds/2629744)+" μήνες"; %>
+<% if( seconds < 63113852) return "πριν ένα χρόνο" %>
+<% return "πάνω από πριν ένα χρόνο" %>
+<% } %>
+
+
+<% function findDistance(locationLat,locationLng,postLocationLat,postLocationLng) { %>
+<% return Math.sqrt(Math.pow((locationLat -postLocationLat)/0.01,2) + Math.pow((locationLng-postLocationLng)/0.012,2)).toPrecision(2) %>
+<% } %>

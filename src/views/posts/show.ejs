@@ -1,0 +1,191 @@
+<% include ../partials/header %>
+<div class="container mt-3">
+  <div class="row">
+    <div class="col">
+      <div class="card mb-3">
+        <div id="map" style="min-height: 500px; width:100%;">
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 col-sm-12">
+              <h3 class="card-title"><%= post.fuelType %></h3>
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <h3 class="float-md-right">&euro;<%= post.price %>/Λίτρο</h3>
+            </div>
+          </div>
+          <a href="/stores/<%= post.location._id %>"><i class="fas fa-map-marker-alt"></i>&nbsp;<%= post.location.location %></a>
+          <p class="text-muted mt-0"><i class="fas fa-user"></i> Προστέθηκε από <a href="/users/<%= post.author._id %>"><%= post.author.username %></a><br>
+          <i class="far fa-clock"></i><%= findTimestamp(post.createdAt) %></p>
+          <% if(currentUser && post.author.equals(currentUser._id) && !currentUser.isBlocked || currentUser && currentUser.isAdmin) { %> <!-- && short-circuits -->
+          <hr>
+          <div class="row justify-content-right">
+            <div class="col-md-6 col-sm-12">
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <div class="float-md-right">
+                <a class="btn btn-warning" href="/posts/<%= post._id %>/edit"><i class="fas fa-edit"></i> Επεξεργασία</a>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#exampleModalLong"><i class="far fa-trash-alt"></i> Διαγραφή</button>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if(currentUser && currentUser.type=="user" && !currentUser.isBlocked) { %>
+  <p>
+    <a id="newButton" href="/posts/new" class="btn btn-success btn-lg"><i class="fas fa-2x fa-plus"></i></a>
+  </p>
+  <% } %>
+  
+  <!--Review section-->
+      <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <% if (post.rating === 0) { %>
+              <h5>
+                <em>Δεν υπάρχουν κριτικές.</em>
+              </h5>
+            <% } else { %>
+              <p>
+                <span class="fas fa-2x fa-star checked"></span>
+                <span class="fa-2x <% if (post.rating <= 1) { %> far fa-star <% } else if(post.rating > 1 && post.rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class="fa-2x <% if (post.rating <= 2) { %> far fa-star <% } else if(post.rating > 2 && post.rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class="fa-2x <% if (post.rating <= 3) { %> far fa-star <% } else if(post.rating > 3 && post.rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <span class="fa-2x <% if (post.rating <= 4) { %> far fa-star <% } else if(post.rating > 4 && post.rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                <br><em>(Σύνολο κριτικών: <%= post.reviews.length %>)</em>
+              </p>
+              <p>
+                Βαθμολογία: <strong><%= post.rating.toFixed(1) %></strong>
+              </p>
+              <p><h4>Τελευταίες κριτικές:</h4></p>
+                <hr style="margin-top: 0;">
+                <% post.reviews.slice(0, 5).forEach(function(review){ %>
+                <div class="row">
+                  <div class="col-md-3">
+                    <%- '<span class="fas fa-star checked"></span>'.repeat(review.rating) %><%- '<span class="far fa-star"></span>'.repeat(5 - review.rating) %>
+                    <div>Από: <a href="/users/<%= review.author._id %>"><strong><%= review.author.username %></strong></a></div>
+                      <span><em><%= review.updatedAt.toDateString() %></em></span>
+                    </div>
+                    <div class="col-md-9">
+                      <p style="text-align: justify; word-wrap: break-word;">
+                        <%= review.text %>
+                      </p>
+                      <% if(currentUser && review.author.equals(currentUser._id)  && !currentUser.isBlocked || currentUser && currentUser.isAdmin){ %>
+                        <a class="btn btn-xs btn-warning"
+                          href="/posts/<%=post._id %>/reviews/<%=review._id %>/edit"><i class="fas fa-edit"></i> Επεξεργασία</a>
+                        <form id="delete-form" action="/posts/<%=post._id %>/reviews/<%=review._id %>?_method=DELETE" method="POST">
+                          <button class="btn btn-xs btn-danger">
+                            <i class="far fa-trash-alt"></i>
+                              Διαγραφή</button>
+                        </form>
+                      <% } %>
+                    </div>
+                </div>
+                <hr>
+                <% }); %>
+                <div style="margin-bottom: 10px;">
+                    <h4><a href="/posts/<%= post._id %>/reviews"><i class="fa fa-search" aria-hidden="true"></i> Όλες οι κριτικές</a></h4>
+                </div>
+                <% } %>
+                <% if(currentUser && !currentUser.isBlocked && currentUser.type=="user") { %>
+                <div>
+                  <a class="btn btn-primary btn-lg <% if (currentUser && post.reviews.some(function (review) {return review.author.equals(currentUser._id)})) { %> disabled <% } %>" href="/posts/<%= post._id %>/reviews/new">
+                    Νέα κριτική</a>
+                </div>
+                <% } %>
+          </div>
+          </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<% if(currentUser && post.author.equals(currentUser._id) && !currentUser.isBlocked || currentUser && currentUser.isAdmin) { %> <!-- && short-circuits -->
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Διαγραφή προσφοράς</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+              <div class="row">
+                  <div class="col">
+                    <h5>Προσοχή!</h5><h6>Η προσφορά θα διαγραφεί οριστικά μετά από αυτό το βήμα.</h6>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="decline" type="button" class="btn btn-default" data-dismiss="modal">Άκυρο</button>
+          <form id="delete-form" action="/posts/<%= post._id %>?_method=DELETE" method="post">
+            <button class="btn btn-danger">
+              <i class="far fa-trash-alt"></i>
+              Διαγραφή</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+
+<script>
+  function initMap() {
+    var lat = <%= post.lat %>;
+    var lng = <%= post.lng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+    <strong><%= post.name %><br />
+    <%= post.location.location %></strong><br>
+    <a href="https://www.google.com/maps/dir/?api=1&destination=<%= post.lat %>,<%= post.lng %>&query_place_id=<%= post.location %>&travelmode=driving" target="_blank">Λήψη Οδηγιών</a>
+    `
+    var infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
+    var marker = new google.maps.Marker({
+        position: center,
+        map: map,
+        animation: google.maps.Animation.DROP
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GEOCODER_API_KEY %>&language=el&region=GR&libraries=places&callback=initMap&fbclid=IwAR2jO4fZa0RL2LeJN4J9QIBZBM3U5Ionjzah-r0WFG4qEndyw7GsFfJwJzE"></script>
+
+
+<% include ../partials/footer %>
+
+<% function findTimestamp(date) { %>
+<% var seconds = Math.ceil((Date.now() - date) / 1000); %>
+<% if( seconds < 60) return "τώρα"; %>
+<% if( seconds < 120) return "πριν ένα λεπτό"; %>
+<% if( seconds < 3600) return "πριν "+Math.floor(seconds/60)+" λεπτά"; %>
+<% if( seconds < 7200) return "πριν μία ώρα"; %>
+<% if( seconds < 86400) return "πριν "+Math.floor(seconds/3600)+" ώρες"; %>
+<% if( seconds < 172800) return "πριν μία μέρα"; %>
+<% if( seconds < 604800) return "πριν "+Math.floor(seconds/86400)+" μέρες"; %>
+<% if( seconds < 1209600) return "πριν μία εβδομάδα"; %>
+<% if( seconds < 2629744) return "πριν "+Math.floor(seconds/604800)+" εβδομάδες"; %>
+<% if( seconds < 5259488) return "πριν ένα μήνα" %>
+<% if( seconds < 31556926) return "πριν "+Math.floor(seconds/2629744)+" μήνες"; %>
+<% if( seconds < 63113852) return "πριν ένα χρόνο" %>
+<% return "πάνω από πριν ένα χρόνο" %>
+<% } %>

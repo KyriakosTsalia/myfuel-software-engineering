@@ -1,0 +1,11 @@
+set terminal png
+set xdata time
+set title "Prices History"
+set style fill solid 0.3
+set style data line
+set ylabel "euro" 
+set timefmt '%m/%d/%y'
+set output 'unleaded95.png'
+set format x "%d-%m" 
+set datafile separator ','
+plot "unleaded95.csv" using 1:2

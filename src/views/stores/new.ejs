@@ -1,0 +1,51 @@
+<% include ../partials/header %>
+
+<div class="container">
+  <div class="row">
+    <div style="width: 30%; min-width: 260px; margin: 40px auto; box-shadow: 0px 0px 5px #cccccc; padding: 20px;">
+      <form action="/stores" method="POST">
+        <legend style="text-align: center; padding: 10px 20px 20px 20px; font-size: 2em;  line-height: 1;">Δημιουργία νέου πρατηρίου</legend>
+        <div class="form-group">
+          <label for="brand">Εταιρεία</label>
+          <select class="form-control" name="brand">
+            <option style="display: none;" disabled selected>--επιλογή εταιρείας--</option>
+            <option value="'AVIN'">AVIN</option>
+            <option value="'bp'">bp</option>
+            <option value="'Coral'">Coral</option>
+            <option value="'Coral Gas'">Coral GAS</option>
+            <option value="'EKO'">EKO</option>
+            <option value="'ELIN'">ELIN</option>
+            <option value="'ETEKA'">ETEKA</option>
+            <option value="'CYCLON'">CYCLON</option>
+            <option value="'melco oil'">melco oil</option>
+            <option value="'revoil'">revoil</option>
+            <option value="'Shell'">Shell</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="name">Επωνυμία</label>
+          <input class="form-control" type="text" name="name" value="" placeholder="Δικαιούχος">
+        </div>
+        <div class="form-group">
+          <label for="location">Διεύθυνση</label>
+          <input class="form-control" type="text" name="location" value="" placeholder="Example St. 43, Example 12345, Greece">
+        </div>
+        <div class="form-group">
+          <label for="phone">Τηλέφωνο</label>
+          <input class="form-control" type="text" name="phone" value="" placeholder="2101234567">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input class="form-control" type="email" name="email" value="" placeholder="example@example.com">
+        </div>
+        <div class="form-group">
+          <button class="btn btn-large btn-primary btn-block" type="submit" name="button">Δημιουργία</button> <!-- BE CAREFUL - type="submit" -->
+        </div>
+      </form>
+      <a href="/stores">Πίσω</a>
+    </div>
+  </div>
+</div>
+
+
+<% include ../partials/footer %>

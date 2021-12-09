@@ -1,0 +1,172 @@
+<% include ../partials/header %>
+
+<div class="card" style="margin-left: 1rem; margin-right: 1rem; margin-bottom: 20rem;">
+          <div class="card-header">
+            <label for="myInput">Αναζήτηση:</label>
+            <input class="form-control" id="myInput" type="text" placeholder="Αναζήτηση χρήστη...">
+          </div>
+          <div class="card-body">
+            <div class="table-responsive table-hover">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <nav aria-label=".." style="float:right;">
+                  <% if (pages && pages > 0) { %>
+                  <ul class="pagination">
+                  <% if (current == 1) { %>
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">First</a></li>
+                  <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/users">First</a></li>
+                  <% } %>
+
+                  <% if (current == 1) { %>
+                    <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&laquo;</span></a></li>
+                  <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/users?page=<%= Number(current) - 1 %>"><span aria-hidden="true">&laquo;</span></a></li>
+                  <% } %>
+
+                  <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+                  <% if (i !== 1) { %>
+                    <li class="page-item disabled"><a class="page-link">...</a></li>
+                  <% } %>
+                  <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                    <% if (i == current) { %>
+                      <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                    <% } else { %>
+                      <li class="page-item"><a class="page-link" href="/users?page=<%= i %>"><%= i %></a></li>
+                    <% } %>
+                    <% if (i == Number(current) + 4 && i < pages) { %>
+                      <li class="page-item disabled"><a class="page-link">...</a></li>
+                    <% } %>
+                  <% } %>
+
+                  <% if (current == pages) { %>
+                    <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&raquo;</span></a></li>
+                  <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/users?page=<%= Number(current) + 1 %>"><span aria-hidden="true">&raquo;</span></a></li>
+                  <% } %>
+
+                  <% if (current == pages) { %>
+                    <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Last</a></li>
+                  <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/users?page=<%= pages %>">Last</a></li>
+                  <% } %>
+                  </ul>
+                <% } %>
+                </nav>
+                <thead class="">
+                  <th>#</th>
+                  <th>Όνομα Χρήστη</th>
+                  <th>Πλήρες Όνομα</th>
+                  <% if(currentUser && currentUser.isAdmin) { %>
+                  <th>Διεύθυνση</th>
+                  <% } %>
+                  <th>Email</th>
+                  <th>Μέλος Από</th>
+                </thead>
+                <tbody id="myTable">
+                  <% for(var i = 0; i < users.length; i++) { %>
+                  <tr>
+                    <td>
+                      <% if(users[i].isAdmin) { %>
+                        <i class="fas fa-user-cog"></i>
+                      <% } else if(users[i].isBlocked){ %>
+                        <i class="fas fa-user-slash"></i>
+                      <% } else { %>
+                        <i class="fas fa-user"></i>
+                      <% } %>&nbsp;<%= (current-1)*20 +  i %>
+                    </td>
+                    <td>
+                      <% if(!users[i].avatar) { %>
+                        <img class="card-img-top small-avatar" src="/img/defaultAvatar.png" alt="user profile image">
+                      <% } else { %>
+                        <img class="card-img-top small-avatar" src="<%= users[i].avatar  %>" alt="user profile image">
+                      <% } %>
+                      <a href="/users/<%= users[i]._id %>">@<%= users[i].username %></a>
+                      <% if (users[i].rating === 0) { %>
+                        <em class="text-muted">(Not rated yet)</em>
+                      <% } else { %>
+                        <span class="fas fa-star checked"></span>
+                        <span class=" <% if (users[i].rating <= 1) { %> far fa-star <% } else if(users[i].rating > 1 && users[i].rating <= 1.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                        <span class=" <% if (users[i].rating <= 2) { %> far fa-star <% } else if(users[i].rating > 2 && users[i].rating <= 2.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                        <span class=" <% if (users[i].rating <= 3) { %> far fa-star <% } else if(users[i].rating > 3 && users[i].rating <= 3.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                        <span class=" <% if (users[i].rating <= 4) { %> far fa-star <% } else if(users[i].rating > 4 && users[i].rating <= 4.5){ %> fas fa-star-half-alt checked <% } else { %> fas fa-star checked <% } %>"></span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <%= users[i].lastName %> <%= users[i].firstName %>
+                    </td>
+                    <% if(currentUser && currentUser.isAdmin) {%>
+                    <td>
+                      <%= users[i].address %>
+                    </td>
+                    <% } %>
+                    <td>
+                      <a href="mailto:<%= users[i].email %>"><%= users[i].email %></a>
+                    </td>
+                    <td>
+                      <%= users[i].createdAt.toDateString() %>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <nav aria-label=".." style="float:right;">
+              <% if (pages && pages > 0) { %>
+              <ul class="pagination">
+              <% if (current == 1) { %>
+                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">First</a></li>
+              <% } else { %>
+                <li class="page-item"><a class="page-link" href="/users">First</a></li>
+              <% } %>
+
+              <% if (current == 1) { %>
+                <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&laquo;</span></a></li>
+              <% } else { %>
+                <li class="page-item"><a class="page-link" href="/users?page=<%= Number(current) - 1 %>"><span aria-hidden="true">&laquo;</span></a></li>
+              <% } %>
+
+              <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+              <% if (i !== 1) { %>
+                <li class="page-item disabled"><a class="page-link">...</a></li>
+              <% } %>
+              <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                <% if (i == current) { %>
+                  <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                <% } else { %>
+                  <li class="page-item"><a class="page-link" href="/users?page=<%= i %>"><%= i %></a></li>
+                <% } %>
+                <% if (i == Number(current) + 4 && i < pages) { %>
+                  <li class="page-item disabled"><a class="page-link">...</a></li>
+                <% } %>
+              <% } %>
+
+              <% if (current == pages) { %>
+                <li class="page-item disabled"><a class="page-link"><span aria-hidden="true">&raquo;</span></a></li>
+              <% } else { %>
+                <li class="page-item"><a class="page-link" href="/users?page=<%= Number(current) + 1 %>"><span aria-hidden="true">&raquo;</span></a></li>
+              <% } %>
+
+              <% if (current == pages) { %>
+                <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">Last</a></li>
+              <% } else { %>
+                <li class="page-item"><a class="page-link" href="/users?page=<%= pages %>">Last</a></li>
+              <% } %>
+              </ul>
+            <% } %>
+            </nav>
+          </div>
+</div>
+
+
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+
+<% include ../partials/footer %>

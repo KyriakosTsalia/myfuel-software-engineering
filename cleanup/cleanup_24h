@@ -1,0 +1,10 @@
+#!/bin/sh
+
+crontab -e
+@daily ./delete_and_extract_entries >/dev/null 2>&1
+
+#List all your cronjobs
+#crontab -l
+
+#Remove all your cronjobs
+#crontab -r
